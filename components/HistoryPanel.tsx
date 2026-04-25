@@ -18,7 +18,7 @@ interface Run {
   nodeDetails?: NodeDetail[];
 }
 
-export default function HistoryPanel() {
+export default function HistoryPanel({ onClose }: any){
   const [runs, setRuns] = useState<Run[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -69,8 +69,20 @@ export default function HistoryPanel() {
     return "bg-yellow-400/10 border-yellow-400/20";
   };
 
-  return (
-    <div className="w-64 flex flex-col bg-[#0f0f0f] border-l border-[#222] text-white">
+    return (
+  <div className="w-64 flex flex-col bg-[#0f0f0f] border-l border-[#222] text-white relative">
+
+    {/* CLOSE BUTTON */}
+    <button
+      onClick={onClose}
+      className="absolute top-2 right-2 text-gray-500 hover:text-white z-10"
+    >
+      ✕
+    </button>
+
+    
+
+    {/* rest of your code... */}
       <div className="p-4 border-b border-[#222]">
         <h2 className="text-sm font-semibold text-white">History</h2>
         <p className="text-xs text-gray-500 mt-0.5">{runs.length} runs</p>
