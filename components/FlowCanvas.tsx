@@ -14,7 +14,14 @@ import ReactFlow, {
   Node,
   Connection,
 } from "reactflow";
-
+type NodeData = {
+  text?: string;
+  output?: any;
+  imageUrl?: string;
+  videoUrl?: string;
+  model?: string;
+  loading?: boolean;
+};
 import "reactflow/dist/style.css";
 
 import TextNode from "@/nodes/TextNode";
@@ -56,11 +63,11 @@ const CONNECTION_RULES: Record<string, Record<string, string[]>> = {
   },
 };
 
-type HistoryEntry = { nodes: Node[]; edges: Edge[] };
+type HistoryEntry = { nodes: Node<NodeData>[]; edges: Edge[] };
 
 function FlowCanvasInner() {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
+const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const { screenToFlowPosition, getNodes, getEdges } = useReactFlow();
   const wrapper = useRef<HTMLDivElement>(null);
@@ -156,9 +163,18 @@ function FlowCanvasInner() {
     saveSnapshot();
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
     setNodes((nds) => [
-      ...nds,
-      { id: getId(), type, position, data: { text: "", output: "", loading: false } },
-    ]);
+  ...nds,
+  {
+    id: getId(),
+    type,
+    position,
+    data: {
+      text: "",
+      output: "",
+      loading: false,
+    } as NodeData,
+  },
+]);
   };
 
   const onDragOver = (e: React.DragEvent) => {
@@ -216,19 +232,26 @@ function FlowCanvasInner() {
   };
 
   const setNodeLoading = (nodeId: string, loading: boolean) => {
-    setNodes((nds) =>
-      nds.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, loading } } : n)
-    );
-  };
+  setNodes((nds) =>
+    nds.map((n) =>
+      n.id === nodeId
+        ? {
+            ...n,
+            data: { ...n.data, loading },
+          }
+        : n
+    )
+  );
+};
 
   const executeWorkflow = async () => {
     const start = Date.now();
     const allEdges = getEdges();
-    const nodeList = getNodes();
+   const nodeList = getNodes() as Node<NodeData>[];
     const completed = new Map<string, any>();
     const nodeDetails: any[] = [];
 
-    const process = async (node: Node): Promise<any> => {
+    const process = async (node: Node<NodeData>): Promise<any> => {
       if (completed.has(node.id)) return completed.get(node.id);
 
       const incoming = allEdges.filter((e) => e.target === node.id);

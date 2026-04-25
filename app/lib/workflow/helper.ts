@@ -1,5 +1,13 @@
-export function buildDependencyMap(nodes, edges) {
-  const map = {};
+import type { Node, Edge } from "reactflow";
+
+/**
+ * Build dependency map
+ */
+export function buildDependencyMap(
+  nodes: Node[],
+  edges: Edge[]
+): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
 
   nodes.forEach((node) => {
     map[node.id] = [];
@@ -12,9 +20,16 @@ export function buildDependencyMap(nodes, edges) {
   return map;
 }
 
-export function getReadyNodes(nodes, dependencies, completed) {
+/**
+ * Get nodes ready for execution
+ */
+export function getReadyNodes(
+  nodes: Node[],
+  dependencies: Record<string, string[]>,
+  completed: Set<string>
+): Node[] {
   return nodes.filter((node) => {
-    const deps = dependencies[node.id];
+    const deps = dependencies[node.id] || [];
     return deps.every((d) => completed.has(d)) && !completed.has(node.id);
   });
 }

@@ -1,29 +1,20 @@
-export async function executeWorkflow(nodes, edges) {
-  const dependencies = buildDependencyMap(nodes, edges);
+import type { Node, Edge } from "reactflow";
 
-  const results = {};
-  const completed = new Set();
+function buildDependencyMap(
+  nodes: Node[],
+  edges: Edge[]
+): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
 
-  while (completed.size < nodes.length) {
-    const readyNodes = getReadyNodes(nodes, dependencies, completed);
+  // initialize
+  nodes.forEach((n) => {
+    map[n.id] = [];
+  });
 
-    if (readyNodes.length === 0) {
-      throw new Error("Cycle detected");
-    }
+  // fill dependencies
+  edges.forEach((e) => {
+    map[e.target].push(e.source);
+  });
 
-    await Promise.all(
-      readyNodes.map(async (node) => {
-        const inputs = dependencies[node.id].map(
-          (depId) => results[depId]
-        );
-
-        const output = await runNode(node, inputs);
-
-        results[node.id] = output;
-        completed.add(node.id);
-      })
-    );
-  }
-
-  return results;
+  return map;
 }
