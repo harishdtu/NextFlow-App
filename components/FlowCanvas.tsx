@@ -30,7 +30,10 @@ import ImageNode from "@/nodes/ImageNode";
 import VideoNode from "@/nodes/VideoNode";
 import CropNode from "@/nodes/CropNode";
 import FrameNode from "@/nodes/FrameNode";
+<<<<<<< HEAD
 import CustomEdge from "./CustomEdge";
+=======
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
 
 const getId = () => crypto.randomUUID();
 
@@ -42,9 +45,13 @@ const nodeTypes = {
   cropNode: CropNode,
   frameNode: FrameNode,
 };
+<<<<<<< HEAD
 const edgeTypes = {
   custom: CustomEdge,
 };
+=======
+
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
 // Type-safe connection rules
 // key = target node type, value = allowed source node types per handle
 const CONNECTION_RULES: Record<string, Record<string, string[]>> = {
@@ -311,6 +318,7 @@ const [nodes, setNodes, onNodesChange] = useNodesState<NodeData>([]);
           return result;
         }
 
+<<<<<<< HEAD
 // ================= CROP =================
 // Replace the cropNode section in executeWorkflow with this:
 
@@ -391,6 +399,65 @@ if (node.type === "frameNode") {
   completed.set(node.id, result);
   return result;
 }
+=======
+        if (node.type === "cropNode") {
+          const source = nodeList.find((n) => n.id === incoming[0]?.source);
+          if (!source) { setNodeLoading(node.id, false); completed.set(node.id, {}); return {}; }
+
+          let image = completed.get(source.id)?.output || source.data?.imageUrl || source.data?.output;
+          if (!image) { setNodeLoading(node.id, false); completed.set(node.id, {}); return {}; }
+          if (image.startsWith("blob:")) image = await toBase64(image);
+
+          const res = await fetch("/api/crop", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageUrl: image }),
+          });
+          const data = await res.json();
+          const result = { output: data.output };
+
+          setNodes((nds) =>
+            nds.map((n) =>
+              n.id === node.id
+                ? { ...n, data: { ...n.data, imageUrl: data.output, output: data.output, loading: false } }
+                : n
+            )
+          );
+
+          nodeDetails.push({ nodeId: node.id, nodeType: "Crop Node", status: "success", duration: Date.now() - nodeStart, output: "Cropped image" });
+          completed.set(node.id, result);
+          return result;
+        }
+
+        if (node.type === "frameNode") {
+          const source = nodeList.find((n) => n.id === incoming[0]?.source);
+          if (!source) { setNodeLoading(node.id, false); completed.set(node.id, {}); return {}; }
+
+          let video = completed.get(source.id)?.videoUrl || source.data?.videoUrl || source.data?.output;
+          if (!video) { setNodeLoading(node.id, false); completed.set(node.id, {}); return {}; }
+          if (video.startsWith("blob:")) video = await toBase64(video);
+
+          const res = await fetch("/api/frame", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ video }),
+          });
+          const data = await res.json();
+          const result = { output: data.output };
+
+          setNodes((nds) =>
+            nds.map((n) =>
+              n.id === node.id
+                ? { ...n, data: { ...n.data, output: data.output, loading: false } }
+                : n
+            )
+          );
+
+          nodeDetails.push({ nodeId: node.id, nodeType: "Frame Node", status: "success", duration: Date.now() - nodeStart, output: "Extracted frame" });
+          completed.set(node.id, result);
+          return result;
+        }
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
 
         setNodeLoading(node.id, false);
         nodeDetails.push({ nodeId: node.id, nodeType: node.type || "Node", status: "success", duration: Date.now() - nodeStart });
@@ -422,12 +489,19 @@ if (node.type === "frameNode") {
   };
 
   return (
+<<<<<<< HEAD
     <div className="w-full h-screen bg-[#0b0d12] 
 [background-image:radial-gradient(#1f2937_1px,transparent_1px)] 
 [background-size:20px_20px]">
       {/* Toolbar */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 items-center flex-wrap justify-center">
         <button onClick={executeWorkflow} className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:scale-[1.03] transition-all text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium">
+=======
+    <div className="w-full h-screen relative" ref={wrapper}>
+      {/* Toolbar */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 items-center flex-wrap justify-center">
+        <button onClick={executeWorkflow} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium">
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
           ▶ Run Workflow
         </button>
         <button onClick={undo} title="Undo (Ctrl+Z)" className="px-3 py-2 bg-[#1a1a1a] border border-[#333] text-white rounded-lg hover:bg-[#252525] transition text-sm">↩</button>
@@ -460,6 +534,7 @@ if (node.type === "frameNode") {
         isValidConnection={isValidConnection}
         fitView
         deleteKeyCode={null}
+<<<<<<< HEAD
         defaultEdgeOptions={{ type: "custom" }}
 
   snapToGrid
@@ -478,6 +553,12 @@ if (node.type === "frameNode") {
   nodeColor="#2a2a33"
   nodeStrokeWidth={0}
 />
+=======
+      >
+        <Background />
+        <Controls />
+        <MiniMap style={{ background: "#1a1a1a" }} maskColor="rgba(0,0,0,0.5)" />
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
       </ReactFlow>
     </div>
   );

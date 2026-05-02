@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -35,6 +36,18 @@ export default function Home() {
         </div>
 
       </div>
+=======
+export default function Home() {
+  return (
+    <div className="h-screen flex flex-col items-center justify-center text-white gap-4">
+      <h1>Welcome to NextFlow 🚀</h1>
+
+      <a href="/dashboard">
+        <button className="bg-blue-600 px-4 py-2 rounded">
+          Go to Dashboard
+        </button>
+      </a>
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
     </div>
   );
 }

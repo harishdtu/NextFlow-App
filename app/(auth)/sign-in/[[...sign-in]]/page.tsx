@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
@@ -25,6 +26,21 @@ export default function SignInPage() {
           }}
         />
       </div>
+=======
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+export default async function Home() {
+  const { userId } = await auth();
+
+  if (userId) {
+    redirect("/dashboard");
+  }
+
+  return (
+    <div className="h-screen flex items-center justify-center text-white">
+      Welcome to NextFlow 🚀
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
     </div>
   );
 }

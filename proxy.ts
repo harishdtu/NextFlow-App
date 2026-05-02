@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -22,6 +23,11 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 });
+=======
+import { clerkMiddleware } from "@clerk/nextjs/server";
+
+export default clerkMiddleware();
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
 
 export const config = {
   matcher: ["/((?!_next|.*\\..*).*)"],

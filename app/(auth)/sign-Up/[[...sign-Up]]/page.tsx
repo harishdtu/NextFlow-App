@@ -1,4 +1,5 @@
 import { SignUp } from "@clerk/nextjs";
+<<<<<<< HEAD
 
 export default function SignUpPage() {
   return (
@@ -23,6 +24,15 @@ export default function SignUpPage() {
           }}
         />
       </div>
+=======
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+export default function Page() {
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <SignUp />
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
     </div>
   );
 }

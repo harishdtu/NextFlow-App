@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
 import { Handle, Position, useReactFlow } from "reactflow";
+=======
+import { useReactFlow } from "reactflow";
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
 import BaseNode from "@/components/BaseNode";
 
 export default function ImageNode({ id, data }: any) {
@@ -9,6 +13,7 @@ export default function ImageNode({ id, data }: any) {
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+<<<<<<< HEAD
     const url = URL.createObjectURL(file);
     setNodes((nds) =>
       nds.map((n) =>
@@ -38,6 +43,34 @@ export default function ImageNode({ id, data }: any) {
       </label>
       <Handle type="source" position={Position.Right}
         style={{ background: "#eab308", width: 8, height: 8, border: "2px solid #713f12" }} />
+=======
+
+    const url = URL.createObjectURL(file);
+
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === id
+          ? { ...n, data: { ...n.data, imageUrl: url } }
+          : n
+      )
+    );
+  };
+
+  return (
+    <BaseNode title="🖼️ Upload Image" data={data}>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleUpload}
+        className="nodrag text-xs text-gray-400 w-full"
+      />
+      {data.imageUrl && (
+        <img
+          src={data.imageUrl}
+          className="mt-2 rounded w-full h-32 object-cover"
+        />
+      )}
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
     </BaseNode>
   );
 }

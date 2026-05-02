@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+<<<<<<< HEAD
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -6,11 +7,18 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY!,
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
+=======
+import ffmpeg from "fluent-ffmpeg";
+import fs from "fs";
+import os from "os";
+import path from "path";
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+<<<<<<< HEAD
     let videoUrl: string = body.video;
     let timestamp = body.timestamp ?? "1";
 
@@ -62,5 +70,36 @@ export async function POST(req: Request) {
   } catch (err: any) {
     console.error("FRAME ERROR:", err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
+=======
+    const base64 = body.video.split(",")[1];
+    const buffer = Buffer.from(base64, "base64");
+
+    const tmpDir = os.tmpdir();
+    const inputPath = path.join(tmpDir, `input_${Date.now()}.mp4`);
+    const outputPath = path.join(tmpDir, `frame_${Date.now()}.jpg`);
+
+    fs.writeFileSync(inputPath, buffer);
+
+    await new Promise((resolve, reject) => {
+      ffmpeg(inputPath)
+        .seekInput(body.timestamp || 1)
+        .frames(1)
+        .output(outputPath)
+        .on("end", resolve)
+        .on("error", reject)
+        .run();
+    });
+
+    const file = fs.readFileSync(outputPath);
+    fs.unlinkSync(inputPath);
+    fs.unlinkSync(outputPath);
+
+    return NextResponse.json({
+      output: `data:image/jpeg;base64,${file.toString("base64")}`,
+    });
+  } catch (err) {
+    console.error("FRAME ERROR:", err);
+    return NextResponse.json({ error: "Frame failed" }, { status: 500 });
+>>>>>>> a852c9a93198feb36e493eafa9501773fc569eb4
   }
 }
