@@ -1,36 +1,183 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NextFlow 🚀
 
-## Getting Started
+A visual AI workflow builder inspired by [Krea.ai](https://krea.ai), built with Next.js 16, React Flow, and Google Gemini API. Drag, drop, and connect nodes to build powerful AI pipelines — no code required.
 
-First, run the development server:
+**[Live Demo](https://next-flow-app-git-main-harishdtus-projects.vercel.app)** · **[GitHub](https://github.com/harishdtus/NextFlow-App)**
+
+---
+
+## ✨ Features
+
+- **Visual Canvas** — Drag and drop nodes onto a React Flow canvas with dot grid background, smooth pan/zoom, and MiniMap
+- **6 Node Types** — Text, Upload Image, Upload Video, LLM, Crop Image, Extract Frame
+- **Gemini API** — Multi-model support (Gemini 2.0 Flash, 2.5 Flash, 2.5 Pro) with multimodal image + text inputs
+- **Parallel Execution** — Independent workflow branches run concurrently via `Promise.all`
+- **Type-Safe Connections** — Invalid node connections are blocked (e.g. video → text input)
+- **Workflow History** — Every run saved to PostgreSQL with per-node execution details
+- **Undo / Redo** — Full undo/redo support (Ctrl+Z / Ctrl+Y)
+- **Export / Import** — Save and load workflows as JSON files
+- **Collapsible Sidebar** — Clean UI with icon-only collapsed mode
+- **Authentication** — Clerk-powered sign in/sign up with protected routes
+- **Cloudinary** — Video uploads and frame extraction via Cloudinary transformations
+
+---
+
+## 🛠 Tech Stack
+
+| Category | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Canvas | React Flow |
+| AI | Google Gemini API |
+| Auth | Clerk |
+| Database | PostgreSQL (Neon) + Prisma ORM |
+| Media | Cloudinary |
+| Image Processing | Sharp |
+| Styling | Tailwind CSS |
+| Validation | Zod |
+| Deployment | Vercel |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/harishdtus/NextFlow-App.git
+cd NextFlow-App
+npm install
+```
+
+### 2. Set up environment variables
+
+Create a `.env.local` file in the root:
+
+```env
+# Database
+DATABASE_URL="postgres://..."
+
+# Clerk Auth
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# Gemini API
+GEMINI_API_KEY=...
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
+
+### 3. Set up the database
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### 4. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 Sample Workflow — Product Marketing Kit Generator
 
-## Learn More
+A pre-built sample workflow is included that demonstrates all 6 node types, parallel execution, and input chaining.
 
-To learn more about Next.js, take a look at the following resources:
+**To load it:**
+1. Click **Import** in the toolbar
+2. Select `sample-workflow.json` from the project root
+3. Upload a product image in the Image node
+4. Upload a product video in the Video node
+5. Click **Run Workflow**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**What it does:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+Branch A (runs in parallel):
+  Text Node (system prompt)  ──┐
+  Text Node (product details) ──┤──► LLM Node 1 (product description)
+  Image Node ──► Crop Node ───┘                    │
+                                                    │
+Branch B (runs in parallel):                        │
+  Video Node ──► Extract Frame ───────────────────┐ │
+                                                  ▼ ▼
+                              Text Node (tweet prompt) ──► LLM Node 2
+                                                              │
+                                                              ▼
+                                                    Final marketing tweet
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🗂 Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+├── app/
+│   ├── api/
+│   │   ├── crop/          # Image cropping with Sharp
+│   │   ├── frame/         # Frame extraction with Cloudinary
+│   │   ├── history/       # Workflow run history CRUD
+│   │   ├── llm/           # Gemini API integration
+│   │   └── upload-video/  # Cloudinary video upload
+│   ├── dashboard/         # Main canvas page
+│   ├── sign-in/           # Clerk auth pages
+│   └── sign-up/
+├── components/
+│   ├── BaseNode.tsx        # Shared node wrapper
+│   ├── FlowCanvas.tsx      # Main canvas + workflow engine
+│   ├── HistoryPanel.tsx    # Right sidebar
+│   └── Sidebar.tsx         # Left sidebar (collapsible)
+├── nodes/
+│   ├── TextNode.tsx
+│   ├── LLMNode.tsx
+│   ├── ImageNode.tsx
+│   ├── VideoNode.tsx
+│   ├── CropNode.tsx
+│   └── FrameNode.tsx
+├── lib/
+│   └── prisma.ts
+├── prisma/
+│   └── schema.prisma
+└── sample-workflow.json    # Pre-built sample workflow
+```
+
+---
+
+## 🔑 API Keys Setup
+
+| Service | Link |
+|---|---|
+| Google Gemini | [aistudio.google.com](https://aistudio.google.com) |
+| Clerk | [clerk.com](https://clerk.com) |
+| Cloudinary | [cloudinary.com](https://cloudinary.com) |
+| Neon PostgreSQL | [neon.tech](https://neon.tech) |
+
+---
+
+## 📦 Deployment
+
+The app is deployed on Vercel. To deploy your own:
+
+1. Push to GitHub
+2. Import repo on [vercel.com](https://vercel.com)
+3. Add all environment variables from `.env.local`
+4. Deploy
+
+---
+
+## 📝 License
+
+MIT
